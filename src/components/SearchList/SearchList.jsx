@@ -18,6 +18,6 @@ const SearchList = ({ items, showlargeImage }) => {
 export default SearchList;
 
 SearchList.propTypes = {
-  showlargeImage: PropTypes.string.isRequired,
+  showlargeImage: PropTypes.func.isRequired,
   items: PropTypes.array.isRequired,
 };
