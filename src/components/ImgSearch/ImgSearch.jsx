@@ -18,6 +18,7 @@ class ImgSearch extends Component {
     page: 1,
     showModal: false,
     largeImage: null,
+    totalHits: 0,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -25,25 +26,23 @@ class ImgSearch extends Component {
     if (prevState.search !== search || prevState.page !== page) {
       this.fetchImj();
     }
-  };
+  }
 
   async fetchImj() {
     try {
-      const { search, page, currentPages } = this.state;
+      const { search, page } = this.state;
       this.setState({ loading: true });
       const data = await getImj(search, page);
-      console.log('data', data);
       this.setState(({ items }) => ({
         items: [...items, ...data.hits],
         totalHits: data.totalHits,
-        currentPages: currentPages + 1,
       }));
     } catch (error) {
       this.setState({ error: error.message });
     } finally {
       this.setState({ loading: false });
     }
-  };
+  }
 
   searchImg = ({ search }) => {
     this.setState({ search, items: [], page: 1 });
@@ -58,7 +57,7 @@ class ImgSearch extends Component {
       largeImage: largeImageURL,
       showModal: true,
     });
-  }; 
+  };
 
   closeModal = () => {
     this.setState({
@@ -68,9 +67,11 @@ class ImgSearch extends Component {
   };
 
   render() {
-    const { items, loading, error, showModal, largeImage } = this.state;
+    const { items, loading, error, showModal, largeImage, totalHits } =
+      this.state;
     const { searchImg, LoadMore, showlargeImage, closeModal } = this;
-    console.log('largeImage', largeImage);
+    let totalPages = Math.ceil(totalHits / items.length) || null;
+
     return (
       <>
         <SearchForm onSubmit={searchImg} />
@@ -90,7 +91,7 @@ class ImgSearch extends Component {
           </div>
         )}
 
-        {Boolean(items.length) && !error && (
+        {totalPages > 1 && (
           <button className={styles.button} onClick={LoadMore}>
             Load More
           </button>
@@ -103,6 +104,6 @@ class ImgSearch extends Component {
       </>
     );
   }
-};
+}
 
 export default ImgSearch;
